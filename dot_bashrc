@@ -159,3 +159,7 @@ fi
 # Nova's custom additions
 
 set -o vi
+
+eval "$(mise activate bash)"
+
+    
