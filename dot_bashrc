@@ -48,6 +48,42 @@ shopt -s checkwinsize
 # Use vi-style command-line editing.
 set -o vi
 
+# ---------------------------------------------------------------------------
+# Prompt
+# ---------------------------------------------------------------------------
+
+# Compact development prompt:
+#
+#   vscode ➜ /workspaces/project (main) $
+#
+# - green username
+# - red arrow when the previous command failed
+# - blue working directory
+# - colored Git branch when inside a repository
+
+__set_prompt() {
+    local exit_code=$?
+    local branch=""
+    local git_part=""
+    local arrow_color='\[\033[0m\]'
+
+    if (( exit_code != 0 )); then
+        arrow_color='\[\033[1;31m\]'
+    fi
+
+    branch="$(
+        git --no-optional-locks symbolic-ref --short HEAD 2>/dev/null ||
+        git --no-optional-locks rev-parse --short HEAD 2>/dev/null
+    )"
+
+    if [[ -n "$branch" ]]; then
+        git_part=" \[\033[0;36m\](\[\033[1;31m\]${branch}\[\033[0;36m\])"
+    fi
+
+    PS1="\[\033[0;32m\]\u ${arrow_color}➜ \[\033[1;34m\]\w${git_part}\[\033[0m\] \$ "
+}
+
+PROMPT_COMMAND="__set_prompt${PROMPT_COMMAND:+; $PROMPT_COMMAND}"
 
 # ---------------------------------------------------------------------------
 # Colors
